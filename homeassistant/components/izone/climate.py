@@ -95,7 +95,7 @@ class ControllerDevice(ClimateDevice):
         self._supported_features = SUPPORT_FAN_MODE
 
         if (
-            controller.ras_mode == "master" and controller.zone_ctrl == 13
+            controller.ras_mode == "master" and controller.zone_ctrl >= 13
         ) or controller.ras_mode == "RAS":
             self._supported_features |= SUPPORT_TARGET_TEMPERATURE
 
