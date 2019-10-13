@@ -95,9 +95,14 @@ class ControllerDevice(ClimateDevice):
         self._supported_features = SUPPORT_FAN_MODE
 
         if (
-            controller.ras_mode == "master" and controller.zone_ctrl >= 13
+            controller.ras_mode == "master" and controller.zone_ctrl == 15
         ) or controller.ras_mode == "RAS":
             self._supported_features |= SUPPORT_TARGET_TEMPERATURE
+        _LOGGER.debug(
+            "On Init: ras_mode: '%s' zone_ctrl: '%s'",
+            controller.ras_mode,
+            controller.zone_ctrl,
+        )
 
         self._state_to_pizone = {
             HVAC_MODE_COOL: Controller.Mode.COOL,
@@ -160,12 +165,26 @@ class ControllerDevice(ClimateDevice):
             """Handle controller data updates."""
             if ctrl is not self._controller:
                 return
-            self.async_schedule_update_ha_state()
+            self.async_schedule_update_ha_state(True)
 
         self.async_on_remove(
             async_dispatcher_connect(
                 self.hass, DISPATCH_CONTROLLER_UPDATE, controller_update
             )
+        )
+
+    async def async_update(self) -> None:
+        """Recheck controller ras mode."""
+        if (
+            self._controller.ras_mode == "master" and self._controller.zone_ctrl == 15
+        ) or self._controller.ras_mode == "RAS":
+            self._supported_features |= SUPPORT_TARGET_TEMPERATURE
+        else:
+            self._supported_features &= ~SUPPORT_TARGET_TEMPERATURE
+        _LOGGER.debug(
+            "On Update: ras_mode: '%s' zone_ctrl: '%s'",
+            self._controller.ras_mode,
+            self._controller.zone_ctrl,
         )
 
     @property
@@ -406,7 +425,6 @@ class ZoneDevice(ClimateDevice):
 
     async def async_added_to_hass(self):
         """Call on adding to hass."""
-
         @callback
         def zone_update(ctrl: Controller, zone: Zone) -> None:
             """Handle zone data updates."""
