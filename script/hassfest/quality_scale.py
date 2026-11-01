@@ -1374,7 +1374,6 @@ INTEGRATIONS_WITHOUT_SCALE = [
     "isy994",
     "itach",
     "itunes",
-    "izone",
     "jellyfin",
     "jewish_calendar",
     "joaoapps_join",
