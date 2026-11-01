@@ -27,6 +27,9 @@
         "data": {
           "host": "[%key:common::config_flow::data::host%]"
         },
+        "data_description": {
+          "host": "The IP address or hostname of your iZone bridge."
+        },
         "description": "Enter the IP address or hostname of your iZone controller."
       },
       "select_controller": {
